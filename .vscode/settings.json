@@ -1,0 +1,8 @@
+{
+    "clangd.arguments": [
+        // example query driver setup when on windows
+        "--query-driver", "C:\\Program Files\\Arm\\GNU Toolchain mingw-w64-x86_64-arm-none-eabi\\bin",
+        "--background-index",
+        "--clang-tidy"
+    ]
+}

@@ -1,0 +1,131 @@
+Here is a complete .clang-tidy file for your STM32 embedded C style:
+
+Checks: >
+  -*,
+  readability-identifier-naming
+
+CheckOptions:
+
+  ########################################
+  # Functions
+  ########################################
+
+  - key: readability-identifier-naming.FunctionCase
+    value: lower_case
+
+  - key: readability-identifier-naming.GlobalFunctionCase
+    value: lower_case
+
+
+  ########################################
+  # Structs / Types
+  ########################################
+
+  # struct tag:
+  # struct uart_context
+  - key: readability-identifier-naming.StructCase
+    value: lower_case
+
+  # typedef:
+  # uart_context_t
+  - key: readability-identifier-naming.TypedefCase
+    value: lower_case
+
+  - key: readability-identifier-naming.TypedefSuffix
+    value: _t
+
+  # enums:
+  # ble_state_t
+  - key: readability-identifier-naming.EnumCase
+    value: lower_case
+
+  - key: readability-identifier-naming.EnumSuffix
+    value: _t
+
+
+  ########################################
+  # Enum constants
+  ########################################
+
+  - key: readability-identifier-naming.EnumConstantCase
+    value: UPPER_CASE
+
+
+  ########################################
+  # Variables
+  ########################################
+
+  # local variables
+  - key: readability-identifier-naming.LocalVariableCase
+    value: lower_case
+
+  # function parameters
+  - key: readability-identifier-naming.ParameterCase
+    value: lower_case
+
+  # normal members
+  - key: readability-identifier-naming.MemberCase
+    value: lower_case
+
+
+  ########################################
+  # Global variables
+  ########################################
+
+  # g_xxx
+  - key: readability-identifier-naming.GlobalVariableCase
+    value: lower_case
+
+  - key: readability-identifier-naming.GlobalVariablePrefix
+    value: g_
+
+
+  ########################################
+  # Global constants
+  ########################################
+
+  # gc_xxx
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: lower_case
+
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: gc_
+
+
+  ########################################
+  # Global pointers
+  ########################################
+
+  # gp_xxx
+  - key: readability-identifier-naming.GlobalPointerCase
+    value: lower_case
+
+  - key: readability-identifier-naming.GlobalPointerPrefix
+    value: gp_
+
+
+  ########################################
+  # Macros
+  ########################################
+
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+
+
+  ########################################
+  # Ignore STM32Cube generated names
+  ########################################
+
+  - key: readability-identifier-naming.FunctionIgnoredRegexp
+    value: '^(MX_|HAL_|LL_|System|Error_Handler|Custom_|APP_|BSP_|UTIL_)'
+
+  - key: readability-identifier-naming.GlobalVariableIgnoredRegexp
+    value: '^(huart|hi2c|hspi|hadc|htim|hrtc|hfdcan|hcan|hospi|hqspi|hsd|hpcd|husb|heth|h_rng|hhash)'
+
+
+  ########################################
+  # Ignore generated STM32 files
+  ########################################
+
+  - key: readability-identifier-naming.IgnoreMainLikeFunctions
+    value: '1'

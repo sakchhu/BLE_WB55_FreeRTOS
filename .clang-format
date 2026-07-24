@@ -1,0 +1,19 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab : Never
+ColumnLimit: 0
+---
+Language: Cpp
+AlignConsecutiveAssignments:
+  Enabled: true
+  AcrossEmptyLines: true
+  AcrossComments: false
+AlignConsecutiveMacros: AcrossEmptyLinesAndComments
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AlignFunctionDeclarations: true
+
+BreakBeforeBraces: Allman
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: false

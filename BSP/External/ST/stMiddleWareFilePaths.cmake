@@ -1,0 +1,42 @@
+set(ST_STM32_WPAN_SRCS
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/interface/patterns/ble_thread/tl/tl_mbox.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/interface/patterns/ble_thread/shci/shci.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/utilities/dbg_trace.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/utilities/otp.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/utilities/stm_list.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/utilities/stm_queue.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/template/osal.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/auto/ble_events.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/auto/ble_gen_aci.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/auto/ble_gap_aci.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/auto/ble_gatt_aci.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/auto/ble_hal_aci.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/auto/ble_hci_le.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/auto/ble_l2cap_aci.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/interface/patterns/ble_thread/tl/hci_tl.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/interface/patterns/ble_thread/tl/hci_tl_if.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/interface/patterns/ble_thread/tl/shci_tl_if.c
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/svc/Src/svc_ctl.c
+)
+
+set(ST_STM32_WPAN_INCLUDE_DIRS
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/interface/patterns/ble_thread
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/interface/patterns/ble_thread/tl
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/interface/patterns/ble_thread/shci
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/utilities
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/auto
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/core/template
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/svc/Inc
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble/svc/Src
+    ${CMAKE_CURRENT_LIST_DIR}/STM32_WPAN/ble
+)
+
+set(ST_TINY_LPM_SRCS
+    ${CMAKE_CURRENT_LIST_DIR}/tiny_lpm/stm32_lpm.c
+)
+set(ST_TINY_LPM_INCLUDE_DIRS
+    ${CMAKE_CURRENT_LIST_DIR}/tiny_lpm
+)
