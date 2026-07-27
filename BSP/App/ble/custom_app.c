@@ -65,10 +65,8 @@ static Custom_App_Context_t Custom_App_Context;
 
 uint8_t UpdateCharData[512];
 uint8_t NotifyCharData[512];
-uint16_t Connection_Handle;
 
 TaskHandle_t gs_tx_task = NULL;
-SemaphoreHandle_t g_x_read_lock = NULL;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Nordic_UART_Service */
@@ -82,17 +80,14 @@ void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotificatio
     /* Nordic_UART_Service */
     case CUSTOM_STM_RX_WRITE_NO_RESP_EVT:
     case CUSTOM_STM_RX_WRITE_EVT:
-        if ( pdTRUE == xSemaphoreTake(g_x_read_lock, 20) )
+    {
+        if ( 1 == Custom_App_Context.Tx_Notification_Status )
         {
             Custom_App_Context.rx_write_data.data_len = pNotification->DataTransfered.Length;
             memcpy(Custom_App_Context.rx_write_data.data_buf, pNotification->DataTransfered.pPayload, Custom_App_Context.rx_write_data.data_len);
-            xSemaphoreGive(g_x_read_lock);
-            xTaskNotify(gs_tx_task, 0, eNoAction);
+            xTaskNotify(gs_tx_task, 0, eSetBits);
         }
-        else
-        {
-            printf("Lost received packets!\n");
-        }
+    }
     break;
 
     case CUSTOM_STM_TX_NOTIFY_ENABLED_EVT:
@@ -133,6 +128,7 @@ void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification) {
         /* USER CODE BEGIN CUSTOM_DISCON_HANDLE_EVT */
         Custom_App_Context.Tx_Notification_Status = 0;
         Custom_App_Context.ConnectionHandle = 0xFFFF;
+        Custom_App_Context.rx_write_data.data_len = 0;
         /* USER CODE END CUSTOM_DISCON_HANDLE_EVT */
         break;
 
@@ -154,11 +150,10 @@ __USED static void nus_tx_task(void* vp_arg)
 {
     while ( 1 )
     {
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY); 
-        if ( xSemaphoreTake(g_x_read_lock, 100) )
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        if ( Custom_App_Context.ConnectionHandle != 0xFFFF && 1 == Custom_App_Context.Tx_Notification_Status && Custom_App_Context.rx_write_data.data_len != 0  )
         {
             Custom_STM_App_Update_Char_Variable_Length(CUSTOM_STM_TX, Custom_App_Context.rx_write_data.data_buf, Custom_App_Context.rx_write_data.data_len);
-            xSemaphoreGive(g_x_read_lock);
         }
         else
         {
@@ -168,9 +163,8 @@ __USED static void nus_tx_task(void* vp_arg)
 }
 
 void Custom_APP_Init(void) {
-    xTaskCreate(nus_tx_task, "nusNotifyTx", 0x1000, NULL, configMAX_PRIORITIES - 2, &gs_tx_task);
+    xTaskCreate(nus_tx_task, "nusNotifyTx", 0x1000, NULL, configMAX_PRIORITIES - 4, &gs_tx_task);
 
-    g_x_read_lock = xSemaphoreCreateMutex();
     Custom_App_Context.Tx_Notification_Status = 0;
     Custom_App_Context.ConnectionHandle = 0xFFFF;
     Custom_App_Context.rx_write_data.data_len = 0;

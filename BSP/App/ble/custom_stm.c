@@ -199,7 +199,11 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event) {
             else if (attribute_modified->Attr_Handle == (CustomContext.CustomRxHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET)) {
                 return_value = SVCCTL_EvtAckFlowEnable;
                 /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_1_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
+                Notification.Custom_Evt_Opcode = CUSTOM_STM_RX_WRITE_NO_RESP_EVT;
+                Notification.DataTransfered.Length = attribute_modified->Attr_Data_Length;
+                Notification.DataTransfered.pPayload = attribute_modified->Attr_Data;
 
+                Custom_STM_App_Notification(&Notification);
                 /* USER CODE END CUSTOM_STM_Service_1_Char_1_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
             } /* if (attribute_modified->Attr_Handle == (CustomContext.CustomRxHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
             /* USER CODE BEGIN EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_END */
@@ -226,11 +230,6 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event) {
                 /* Allow or reject a write request from a client using aci_gatt_write_resp(...) function */
                 /*USER CODE BEGIN CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE */
                 aci_gatt_permit_write(write_perm_req->Connection_Handle, write_perm_req->Attribute_Handle, 0x00, 0x00, write_perm_req->Data_Length, write_perm_req->Data);
-                Notification.Custom_Evt_Opcode = CUSTOM_STM_RX_WRITE_NO_RESP_EVT;
-                Notification.DataTransfered.Length = write_perm_req->Data_Length;
-                Notification.DataTransfered.pPayload = write_perm_req->Data;
-
-                Custom_STM_App_Notification(&Notification);
                 /*USER CODE END CUSTOM_STM_Service_1_Char_1_ACI_GATT_WRITE_PERMIT_REQ_VSEVT_CODE*/
             } /*if (write_perm_req->Attribute_Handle == (CustomContext.CustomRxHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
 
@@ -346,11 +345,11 @@ void SVCCTL_InitCustomSvc(void) {
     ret = aci_gatt_add_char(CustomContext.CustomNusHdle,
                             UUID_TYPE_128, &uuid,
                             SizeRx,
-                            CHAR_PROP_WRITE_WITHOUT_RESP | CHAR_PROP_WRITE,
+                            CHAR_PROP_WRITE_WITHOUT_RESP,
                             ATTR_PERMISSION_NONE,
-                            GATT_NOTIFY_ATTRIBUTE_WRITE | GATT_NOTIFY_WRITE_REQ_AND_WAIT_FOR_APPL_RESP,
+                            GATT_NOTIFY_ATTRIBUTE_WRITE,
                             0x10,
-                            CHAR_VALUE_LEN_CONSTANT,
+                            CHAR_VALUE_LEN_VARIABLE,
                             &(CustomContext.CustomRxHdle));
     if (ret != BLE_STATUS_SUCCESS) {
         printf("  Fail   : aci_gatt_add_char command   : RX, error code: 0x%x \n\r", ret);

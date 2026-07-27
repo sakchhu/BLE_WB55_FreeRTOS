@@ -131,7 +131,6 @@ void hci_user_evt_proc(void)
     hci_notify_asynch_evt((void*) &HciAsynchEventQueue);
   }
 
-
   return;
 }
 

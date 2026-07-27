@@ -509,71 +509,6 @@ PRIORITY THAN THIS! (higher priorities are lower numeric values. */
  * provided for the same. Defaults to 0 if left undefined. */
 #define configENABLE_ACCESS_CONTROL_LIST                       1
 
-/******************************************************************************/
-/* SMP( Symmetric MultiProcessing ) Specific Configuration definitions. *******/
-/******************************************************************************/
-
-/* Set configNUMBER_OF_CORES to the number of available processor cores.
- * Defaults to 1 if left undefined. */
-
-/*
- #define configNUMBER_OF_CORES                     [Num of available cores]
- */
-
-/* When using SMP (i.e. configNUMBER_OF_CORES is greater than one), set
- * configRUN_MULTIPLE_PRIORITIES to 0 to allow multiple tasks to run
- * simultaneously only if they do not have equal priority, thereby maintaining
- * the paradigm of a lower priority task never running if a higher priority task
- * is able to run. If configRUN_MULTIPLE_PRIORITIES is set to 1, multiple tasks
- * with different priorities may run simultaneously - so a higher and lower
- * priority task may run on different cores at the same time. */
-#define configRUN_MULTIPLE_PRIORITIES                          0
-
-/* When using SMP (i.e. configNUMBER_OF_CORES is greater than one), set
- * configUSE_CORE_AFFINITY to 1 to enable core affinity feature. When core
- * affinity feature is enabled, the vTaskCoreAffinitySet and
- * vTaskCoreAffinityGet APIs can be used to set and retrieve which cores a task
- * can run on. If configUSE_CORE_AFFINITY is set to 0 then the FreeRTOS
- * scheduler is free to run any task on any available core. */
-#define configUSE_CORE_AFFINITY                                0
-
-/* When using SMP with core affinity feature enabled, set
- * configTASK_DEFAULT_CORE_AFFINITY to change the default core affinity mask for
- * tasks created without an affinity mask specified. Setting the define to 1
- * would make such tasks run on core 0 and setting it to (1 <<
- * portGET_CORE_ID()) would make such tasks run on the current core. This config
- * value is useful, if swapping tasks between cores is not supported (e.g.
- * Tricore) or if legacy code should be controlled. Defaults to tskNO_AFFINITY
- * if left undefined. */
-#define configTASK_DEFAULT_CORE_AFFINITY                       tskNO_AFFINITY
-
-/* When using SMP (i.e. configNUMBER_OF_CORES is greater than one), if
- * configUSE_TASK_PREEMPTION_DISABLE is set to 1, individual tasks can be set to
- * either pre-emptive or co-operative mode using the vTaskPreemptionDisable and
- * vTaskPreemptionEnable APIs. */
-#define configUSE_TASK_PREEMPTION_DISABLE                      0
-
-/* When using SMP (i.e. configNUMBER_OF_CORES is greater than one), set
- * configUSE_PASSIVE_IDLE_HOOK to 1 to allow the application writer to use
- * the passive idle task hook to add background functionality without the
- * overhead of a separate task. Defaults to 0 if left undefined. */
-#define configUSE_PASSIVE_IDLE_HOOK                            0
-
-/* When using SMP (i.e. configNUMBER_OF_CORES is greater than one),
- * configTIMER_SERVICE_TASK_CORE_AFFINITY allows the application writer to set
- * the core affinity of the RTOS Daemon/Timer Service task. Defaults to
- * tskNO_AFFINITY if left undefined. */
-#define configTIMER_SERVICE_TASK_CORE_AFFINITY                 tskNO_AFFINITY
-
-/******************************************************************************/
-/* ARMv8-M secure side port related definitions. ******************************/
-/******************************************************************************/
-
-/* secureconfigMAX_SECURE_CONTEXTS define the maximum number of tasks that can
- *  call into the secure side of an ARMv8-M chip.  Not used by any other ports.
- */
-#define secureconfigMAX_SECURE_CONTEXTS                        5
-
 /* Defines the kernel provided implementation of
  * vApplicationGetIdleTaskMemory() and vApplicationGetTimerTaskMemory()
  * to provide the memory that is used by the Idle task and Timer task
@@ -601,7 +536,7 @@ PRIORITY THAN THIS! (higher priorities are lower numeric values. */
 
 /* Set configENABLE_MPU to 1 to enable the Memory Protection Unit (MPU), or 0
  * to leave the Memory Protection Unit disabled. */
-#define configENABLE_MPU                                       1
+#define configENABLE_MPU                                       0
 
 /* Set configENABLE_FPU to 1 to enable the Floating Point Unit (FPU), or 0
  * to leave the Floating Point Unit disabled. */
@@ -613,7 +548,7 @@ PRIORITY THAN THIS! (higher priorities are lower numeric values. */
  * (MVE) is available only on these architectures. configENABLE_MVE must be left
  * undefined, or defined to 0 for the Cortex-M23,Cortex-M33 and Cortex-M35P
  * ports. */
-#define configENABLE_MVE                                       1
+#define configENABLE_MVE                                       0
 
 /******************************************************************************/
 /* ARMv7-M and ARMv8-M port Specific Configuration definitions. ***************/

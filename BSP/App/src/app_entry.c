@@ -67,8 +67,8 @@ PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t BleSpareEvtBuffer[sizeof(TL_
 
 /* USER CODE BEGIN PV */
 TaskHandle_t g_shci_user_evt_task = NULL;
-SemaphoreHandle_t g_mtx_shci = NULL;
-SemaphoreHandle_t g_sem_schi = NULL;
+SemaphoreHandle_t g_shci_cmd_busy_lock = NULL;
+SemaphoreHandle_t g_shci_cmd_resp_lock = NULL;
 /* USER CODE END PV */
 
 /* Private functions prototypes-----------------------------------------------*/
@@ -296,7 +296,6 @@ static void SystemPower_Config(void)
   LL_RCC_SetClkAfterWakeFromStop(LL_RCC_STOP_WAKEUPCLOCK_HSI);
 
   /* Initialize low power manager */
-  UTIL_LPM_Init();
   /* Initialize the CPU2 reset value before starting CPU2 with C2BOOT */
   LL_C2_PWR_SetPowerMode(LL_PWR_MODE_SHUTDOWN);
 
@@ -326,11 +325,11 @@ static void appe_Tl_Init(void)
   /**< Reference table initialization */
   TL_Init();
 
-  g_mtx_shci = xSemaphoreCreateMutex();
-  g_sem_schi = xSemaphoreCreateBinary();
+  g_shci_cmd_busy_lock = xSemaphoreCreateMutex();
+  g_shci_cmd_resp_lock = xSemaphoreCreateBinary();
 
   /**< System channel initialization */
-  xTaskCreate(shci_user_evt_task, "shciUserEvt", 0x1000, NULL, configMAX_PRIORITIES - 2, &g_shci_user_evt_task);
+  xTaskCreate(shci_user_evt_task, "shciUserEvt", 0x1000, NULL, configMAX_PRIORITIES - 3, &g_shci_user_evt_task);
   SHci_Tl_Init_Conf.p_cmdbuffer = (uint8_t*)&SystemCmdBuffer;
   SHci_Tl_Init_Conf.StatusNotCallBack = APPE_SysStatusNot;
   shci_init(APPE_SysUserEvtRx, (void*) &SHci_Tl_Init_Conf);
@@ -353,17 +352,13 @@ static void APPE_SysStatusNot(SHCI_TL_CmdStatus_t status)
   {
     case SHCI_TL_CmdBusy:
     {
-      BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-      xSemaphoreTakeFromISR(g_mtx_shci, &xHigherPriorityTaskWoken);
-      portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+      xSemaphoreTake(g_shci_cmd_busy_lock, portMAX_DELAY);
       break;
     }
 
     case SHCI_TL_CmdAvailable:
     {
-      BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-      xSemaphoreGiveFromISR(g_mtx_shci, &xHigherPriorityTaskWoken);
-      portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+      xSemaphoreGive(g_shci_cmd_busy_lock);
       break;
     }
 
@@ -433,6 +428,7 @@ static void APPE_SysUserEvtRx(void * pPayload)
     break;
 
   default:
+    printf(">>== SHCI_UNHANDLED\n\r");
     break;
   }
 
@@ -518,7 +514,7 @@ static void APPE_SysEvtReadyProcessing(void * pPayload)
     (void)SHCI_C2_Config(&config_param);
 
     APP_BLE_Init();
-    UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
+    // UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
   }
   else if (p_sys_ready_event->sysevt_ready_rsp == FUS_FW_RUNNING)
   {
@@ -588,33 +584,23 @@ void MX_APPE_Process(void)
   /* USER CODE END MX_APPE_Process_2 */
 }
 
-void UTIL_SEQ_Idle(void)
-{
-#if (CFG_LPM_SUPPORTED == 1)
-  UTIL_LPM_EnterLowPower();
-#endif /* CFG_LPM_SUPPORTED == 1 */
-  return;
-}
-
 void shci_notify_asynch_evt(void* pdata)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  vTaskNotifyGiveFromISR(g_shci_user_evt_task, &xHigherPriorityTaskWoken);
+  xTaskNotifyFromISR(g_shci_user_evt_task, 1, eSetBits, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 void shci_cmd_resp_release(uint32_t flag)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  xSemaphoreGiveFromISR(g_sem_schi, &xHigherPriorityTaskWoken);
+  xSemaphoreGiveFromISR(g_shci_cmd_resp_lock, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 void shci_cmd_resp_wait(uint32_t timeout)
 {
-  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  xSemaphoreTakeFromISR(g_sem_schi, &xHigherPriorityTaskWoken);
-  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+  xSemaphoreTake(g_shci_cmd_resp_lock, timeout);
 }
 
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */

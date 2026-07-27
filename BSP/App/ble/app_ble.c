@@ -324,11 +324,6 @@ void APP_BLE_Init(void)
   Ble_Tl_Init();
 
   /**
-   * Do not allow standby in the application
-   */
-  UTIL_LPM_SetOffMode(1 << CFG_LPM_APP_BLE, UTIL_LPM_DISABLE);
-
-  /**
    * Starts the BLE Stack on CPU2
    */
   status = SHCI_C2_BLE_Init(&ble_init_cmd_packet);
@@ -422,9 +417,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
   tBleStatus        ret = BLE_STATUS_INVALID_PARAMS;
   hci_le_connection_complete_event_rp0        *p_connection_complete_event;
   hci_disconnection_complete_event_rp0        *p_disconnection_complete_event;
-#if (CFG_DEBUG_APP_TRACE != 0)
   hci_le_connection_update_complete_event_rp0 *p_connection_update_complete_event;
-#endif /* CFG_DEBUG_APP_TRACE != 0 */
 
   /* PAIRING */
   aci_gap_pairing_complete_event_rp0          *p_pairing_complete;
@@ -439,7 +432,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
   switch (p_event_pckt->evt)
   {
     case HCI_DISCONNECTION_COMPLETE_EVT_CODE:
-    {
+    {      
       p_disconnection_complete_event = (hci_disconnection_complete_event_rp0 *) p_event_pckt->data;
 
       if (p_disconnection_complete_event->Connection_Handle == BleApplicationContext.BleApplicationContext_legacy.connectionHandle)
@@ -494,14 +487,12 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
       switch (p_meta_evt->subevent)
       {
         case HCI_LE_CONNECTION_UPDATE_COMPLETE_SUBEVT_CODE:
-#if (CFG_DEBUG_APP_TRACE != 0)
           p_connection_update_complete_event = (hci_le_connection_update_complete_event_rp0 *) p_meta_evt->data;
           printf(">>== HCI_LE_CONNECTION_UPDATE_COMPLETE_SUBEVT_CODE\n");
           printf("     - Connection Interval:   %.2f ms\n     - Connection latency:    %d\n     - Supervision Timeout: %d ms\n\r",
                        p_connection_update_complete_event->Conn_Interval*1.25,
                        p_connection_update_complete_event->Conn_Latency,
                        p_connection_update_complete_event->Supervision_Timeout*10);
-#endif /* CFG_DEBUG_APP_TRACE != 0 */
 
           /* USER CODE BEGIN EVT_LE_CONN_UPDATE_COMPLETE */
 
@@ -551,6 +542,160 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
           break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
         }
 
+        case HCI_LE_ADVERTISING_REPORT_SUBEVT_CODE:
+          printf("HCI_LE_ADVERTISING_REPORT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_READ_REMOTE_FEATURES_PAGE_0_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_READ_REMOTE_FEATURES_PAGE_0_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_LONG_TERM_KEY_REQUEST_SUBEVT_CODE:
+          printf("HCI_LE_LONG_TERM_KEY_REQUEST_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_REMOTE_CONNECTION_PARAMETER_REQUEST_SUBEVT_CODE:
+          printf("HCI_LE_REMOTE_CONNECTION_PARAMETER_REQUEST_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_DATA_LENGTH_CHANGE_SUBEVT_CODE:
+          printf("HCI_LE_DATA_LENGTH_CHANGE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_READ_LOCAL_P256_PUBLIC_KEY_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_READ_LOCAL_P256_PUBLIC_KEY_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_GENERATE_DHKEY_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_GENERATE_DHKEY_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_ENHANCED_CONNECTION_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_ENHANCED_CONNECTION_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_DIRECTED_ADVERTISING_REPORT_SUBEVT_CODE:
+          printf("HCI_LE_DIRECTED_ADVERTISING_REPORT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PHY_UPDATE_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_PHY_UPDATE_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_EXTENDED_ADVERTISING_REPORT_SUBEVT_CODE:
+          printf("HCI_LE_EXTENDED_ADVERTISING_REPORT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PERIODIC_ADVERTISING_SYNC_ESTABLISHED_SUBEVT_CODE:
+          printf("HCI_LE_PERIODIC_ADVERTISING_SYNC_ESTABLISHED_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PERIODIC_ADVERTISING_REPORT_SUBEVT_CODE:
+          printf("HCI_LE_PERIODIC_ADVERTISING_REPORT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PERIODIC_ADVERTISING_SYNC_LOST_SUBEVT_CODE:
+          printf("HCI_LE_PERIODIC_ADVERTISING_SYNC_LOST_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_SCAN_TIMEOUT_SUBEVT_CODE:
+          printf("HCI_LE_SCAN_TIMEOUT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_ADVERTISING_SET_TERMINATED_SUBEVT_CODE:
+          printf("HCI_LE_ADVERTISING_SET_TERMINATED_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_SCAN_REQUEST_RECEIVED_SUBEVT_CODE:
+          printf("HCI_LE_SCAN_REQUEST_RECEIVED_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CHANNEL_SELECTION_ALGORITHM_SUBEVT_CODE:
+          printf("HCI_LE_CHANNEL_SELECTION_ALGORITHM_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CONNECTIONLESS_IQ_REPORT_SUBEVT_CODE:
+          printf("HCI_LE_CONNECTIONLESS_IQ_REPORT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CONNECTION_IQ_REPORT_SUBEVT_CODE:
+          printf("HCI_LE_CONNECTION_IQ_REPORT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CTE_REQUEST_FAILED_SUBEVT_CODE:
+          printf("HCI_LE_CTE_REQUEST_FAILED_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PERIODIC_ADVERTISING_SYNC_TRANSFER_RECEIVED_SUBEVT_CODE:
+          printf("HCI_LE_PERIODIC_ADVERTISING_SYNC_TRANSFER_RECEIVED_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CIS_ESTABLISHED_SUBEVT_CODE:
+          printf("HCI_LE_CIS_ESTABLISHED_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CIS_REQUEST_SUBEVT_CODE:
+          printf("HCI_LE_CIS_REQUEST_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CREATE_BIG_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_CREATE_BIG_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_TERMINATE_BIG_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_TERMINATE_BIG_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_BIG_SYNC_ESTABLISHED_SUBEVT_CODE:
+          printf("HCI_LE_BIG_SYNC_ESTABLISHED_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_BIG_SYNC_LOST_SUBEVT_CODE:
+          printf("HCI_LE_BIG_SYNC_LOST_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_REQUEST_PEER_SCA_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_REQUEST_PEER_SCA_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PATH_LOSS_THRESHOLD_SUBEVT_CODE:
+          printf("HCI_LE_PATH_LOSS_THRESHOLD_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_TRANSMIT_POWER_REPORTING_SUBEVT_CODE:
+          printf("HCI_LE_TRANSMIT_POWER_REPORTING_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_BIGINFO_ADVERTISING_REPORT_SUBEVT_CODE:
+          printf("HCI_LE_BIGINFO_ADVERTISING_REPORT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_SUBRATE_CHANGE_SUBEVT_CODE:
+          printf("HCI_LE_SUBRATE_CHANGE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PERIODIC_ADVERTISING_SYNC_ESTABLISHED_V2_SUBEVT_CODE:
+          printf("HCI_LE_PERIODIC_ADVERTISING_SYNC_ESTABLISHED_V2_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PERIODIC_ADVERTISING_REPORT_V2_SUBEVT_CODE:
+          printf("HCI_LE_PERIODIC_ADVERTISING_REPORT_V2_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PERIODIC_ADVERTISING_SYNC_TRANSFER_RECEIVED_V2_SUBEVT_CODE:
+          printf("HCI_LE_PERIODIC_ADVERTISING_SYNC_TRANSFER_RECEIVED_V2_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PERIODIC_ADVERTISING_SUBEVENT_DATA_REQUEST_SUBEVT_CODE:
+          printf("HCI_LE_PERIODIC_ADVERTISING_SUBEVENT_DATA_REQUEST_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_PERIODIC_ADVERTISING_RESPONSE_REPORT_SUBEVT_CODE:
+          printf("HCI_LE_PERIODIC_ADVERTISING_RESPONSE_REPORT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_ENHANCED_CONNECTION_COMPLETE_V2_SUBEVT_CODE:
+          printf("HCI_LE_ENHANCED_CONNECTION_COMPLETE_V2_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CIS_ESTABLISHED_V2_SUBEVT_CODE:
+          printf("HCI_LE_CIS_ESTABLISHED_V2_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_READ_ALL_REMOTE_FEATURES_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_READ_ALL_REMOTE_FEATURES_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CS_READ_REMOTE_SUPPORTED_CAPABILITIES_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_CS_READ_REMOTE_SUPPORTED_CAPABILITIES_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CS_READ_REMOTE_FAE_TABLE_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_CS_READ_REMOTE_FAE_TABLE_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CS_SECURITY_ENABLE_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_CS_SECURITY_ENABLE_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CS_CONFIG_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_CS_CONFIG_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CS_PROCEDURE_ENABLE_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_CS_PROCEDURE_ENABLE_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CS_SUBEVENT_RESULT_SUBEVT_CODE:
+          printf("HCI_LE_CS_SUBEVENT_RESULT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CS_SUBEVENT_RESULT_CONTINUE_SUBEVT_CODE:
+          printf("HCI_LE_CS_SUBEVENT_RESULT_CONTINUE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_CS_TEST_END_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_CS_TEST_END_COMPLETE_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_MONITORED_ADVERTISERS_REPORT_SUBEVT_CODE:
+          printf("HCI_LE_MONITORED_ADVERTISERS_REPORT_SUBEVT_CODE\n");
+        break;
+        case HCI_LE_FRAME_SPACE_UPDATE_COMPLETE_SUBEVT_CODE:
+          printf("HCI_LE_FRAME_SPACE_UPDATE_COMPLETE_SUBEVT_CODE\n");
+        break;
+
         default:
           /* USER CODE BEGIN SUBEVENT_DEFAULT */
 
@@ -597,7 +742,6 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
 #if (RADIO_ACTIVITY_EVENT != 0)
         case ACI_HAL_END_OF_RADIO_ACTIVITY_VSEVT_CODE:
           /* USER CODE BEGIN RADIO_ACTIVITY_EVENT*/
-
           /* USER CODE END RADIO_ACTIVITY_EVENT*/
           break; /* ACI_HAL_END_OF_RADIO_ACTIVITY_VSEVT_CODE */
 #endif /* RADIO_ACTIVITY_EVENT != 0 */
@@ -705,7 +849,6 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
 
     default:
       /* USER CODE BEGIN ECODE_DEFAULT*/
-
       /* USER CODE END ECODE_DEFAULT*/
       break;
   }
@@ -1192,7 +1335,7 @@ static void Connection_Interval_Update_Req(void)
 void hci_notify_asynch_evt(void* p_Data)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;      
-  xTaskNotifyFromISR(g_x_hci_user_evt_task, 1, eNoAction, &xHigherPriorityTaskWoken);
+  xTaskNotifyFromISR(g_x_hci_user_evt_task, 1, eSetBits, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   return;
 }
@@ -1200,9 +1343,8 @@ void hci_notify_asynch_evt(void* p_Data)
 void hci_cmd_resp_release(uint32_t Flag)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  xSemaphoreGiveFromISR( g_x_sem_hci, &xHigherPriorityTaskWoken);
+  xSemaphoreGiveFromISR(g_x_sem_hci, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-
   return;
 }
 
@@ -1210,7 +1352,6 @@ void hci_cmd_resp_wait(uint32_t Timeout)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
   xSemaphoreTakeFromISR(g_x_sem_hci, &xHigherPriorityTaskWoken);
-  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
   return;
 }
@@ -1237,16 +1378,19 @@ static void BLE_UserEvtRx(void *p_Payload)
 
 static void BLE_StatusNot(HCI_TL_CmdStatus_t Status)
 {
-  // uint32_t task_id_list;
   switch (Status)
   {
     case HCI_TL_CmdBusy:
+    {
       xSemaphoreTake(g_x_mtx_hci, portMAX_DELAY);
       break;
+    }
 
     case HCI_TL_CmdAvailable:
+    {
       xSemaphoreGive(g_x_mtx_hci);
       break;
+    }
 
     default:
       break;
