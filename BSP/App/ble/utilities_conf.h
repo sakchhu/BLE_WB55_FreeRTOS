@@ -39,25 +39,6 @@ extern "C" {
 
 #define UTILS_MEMSET8( dest, value, size )      memset( dest, value, size);
 
-/******************************************************************************
- * tiny low power manager
- * (any macro that does not need to be modified can be removed)
- ******************************************************************************/
-#define UTIL_LPM_INIT_CRITICAL_SECTION( )
-#define UTIL_LPM_ENTER_CRITICAL_SECTION( )      UTILS_ENTER_CRITICAL_SECTION( )
-#define UTIL_LPM_EXIT_CRITICAL_SECTION( )       UTILS_EXIT_CRITICAL_SECTION( )
-
-/******************************************************************************
- * sequencer
- * (any macro that does not need to be modified can be removed)
- ******************************************************************************/
-#define UTIL_SEQ_INIT_CRITICAL_SECTION( )
-#define UTIL_SEQ_ENTER_CRITICAL_SECTION( )      UTILS_ENTER_CRITICAL_SECTION( )
-#define UTIL_SEQ_EXIT_CRITICAL_SECTION( )       UTILS_EXIT_CRITICAL_SECTION( )
-#define UTIL_SEQ_CONF_TASK_NBR                  (32)
-#define UTIL_SEQ_CONF_PRIO_NBR                  CFG_SCH_PRIO_NBR
-#define UTIL_SEQ_MEMSET8( dest, value, size )   UTILS_MEMSET8( dest, value, size )
-
 #ifdef __cplusplus
 }
 #endif

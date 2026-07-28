@@ -1,4 +1,3 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    app_entry.c
@@ -16,7 +15,6 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "app_common.h"
@@ -33,31 +31,23 @@
 #include "otp.h"
 
 /* Private includes -----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
 
-/* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 extern RTC_HandleTypeDef hrtc;
 
-/* USER CODE BEGIN PTD */
 
-/* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
 #define POOL_SIZE (CFG_TLBLE_EVT_QUEUE_LENGTH*4U*DIVC((sizeof(TL_PacketHeader_t) + TL_BLE_EVENT_FRAME_SIZE), 4U))
 
-/* USER CODE BEGIN PD */
 
-/* USER CODE END PD */
 
 /* Private macros ------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
 
-/* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t EvtPool[POOL_SIZE];
@@ -65,11 +55,9 @@ PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t SystemCmdBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t SystemSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255U];
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t BleSpareEvtBuffer[sizeof(TL_PacketHeader_t) + TL_EVT_HDR_SIZE + 255];
 
-/* USER CODE BEGIN PV */
 TaskHandle_t g_shci_user_evt_task = NULL;
 SemaphoreHandle_t g_shci_cmd_busy_lock = NULL;
 SemaphoreHandle_t g_shci_cmd_resp_lock = NULL;
-/* USER CODE END PV */
 
 /* Private functions prototypes-----------------------------------------------*/
 static void Config_HSE(void);
@@ -85,10 +73,6 @@ static void APPE_SysStatusNot(SHCI_TL_CmdStatus_t status);
 static void APPE_SysUserEvtRx(void * pPayload);
 static void APPE_SysEvtReadyProcessing(void * pPayload);
 static void APPE_SysEvtError(void * pPayload);
-static void Init_Rtc(void);
-
-/* USER CODE BEGIN PFP */
-/* USER CODE END PFP */
 
 /* Functions Definition ------------------------------------------------------*/
 void MX_APPE_Config(void)
@@ -117,11 +101,6 @@ void MX_APPE_Init(void)
 
   SystemPower_Config(); /**< Configure the system Power Mode */
 
-  // HW_TS_Init(hw_ts_InitMode_Full, &hrtc); /**< Initialize the TimerServer */
-
-/* USER CODE BEGIN APPE_Init_1 */
-
-/* USER CODE END APPE_Init_1 */
   appe_Tl_Init();	/* Initialize all transport layers */
 
   /**
@@ -129,9 +108,6 @@ void MX_APPE_Init(void)
    * received on the system channel before starting the Stack
    * This system event is received with APPE_SysUserEvtRx()
    */
-/* USER CODE BEGIN APPE_Init_2 */
-
-/* USER CODE END APPE_Init_2 */
 
    return;
 }
@@ -162,9 +138,7 @@ void Init_Exti(void)
   return;
 }
 
-/* USER CODE BEGIN FD */
 
-/* USER CODE END FD */
 
 /*************************************************************
  *
@@ -261,21 +235,6 @@ static void System_Init(void)
   Init_Smps();
 
   Init_Exti();
-
-  Init_Rtc();
-
-  return;
-}
-
-static void Init_Rtc(void)
-{
-  /* Disable RTC registers write protection */
-  LL_RTC_DisableWriteProtection(RTC);
-
-  LL_RTC_WAKEUP_SetClock(RTC, CFG_RTC_WUCKSEL_DIVIDER);
-
-  /* Enable RTC registers write protection */
-  LL_RTC_EnableWriteProtection(RTC);
 
   return;
 }
@@ -514,7 +473,6 @@ static void APPE_SysEvtReadyProcessing(void * pPayload)
     (void)SHCI_C2_Config(&config_param);
 
     APP_BLE_Init();
-    // UTIL_LPM_SetOffMode(1U << CFG_LPM_APP, UTIL_LPM_DISABLE);
   }
   else if (p_sys_ready_event->sysevt_ready_rsp == FUS_FW_RUNNING)
   {
@@ -534,10 +492,6 @@ static void APPE_SysEvtReadyProcessing(void * pPayload)
 
   return;
 }
-
-/* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
-
-/* USER CODE END FD_LOCAL_FUNCTIONS */
 
 /*************************************************************
  *
@@ -573,17 +527,6 @@ void HAL_Delay(uint32_t Delay)
   }
 }
 
-void MX_APPE_Process(void)
-{
-  /* USER CODE BEGIN MX_APPE_Process_1 */
-
-  /* USER CODE END MX_APPE_Process_1 */
-  vTaskStartScheduler();
-  /* USER CODE BEGIN MX_APPE_Process_2 */
-
-  /* USER CODE END MX_APPE_Process_2 */
-}
-
 void shci_notify_asynch_evt(void* pdata)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -602,7 +545,3 @@ void shci_cmd_resp_wait(uint32_t timeout)
 {
   xSemaphoreTake(g_shci_cmd_resp_lock, timeout);
 }
-
-/* USER CODE BEGIN FD_WRAP_FUNCTIONS */
-
-/* USER CODE END FD_WRAP_FUNCTIONS */

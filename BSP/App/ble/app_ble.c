@@ -1,4 +1,3 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    App/app_ble.c
@@ -16,7 +15,6 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "board/pin_defs.h"
@@ -39,9 +37,7 @@
 #include "semphr.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 
-/* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -88,9 +84,7 @@ typedef struct _tSecurityParams
    * processing
    */
   uint8_t initiateSecurity;
-  /* USER CODE BEGIN tSecurityParams*/
 
-  /* USER CODE END tSecurityParams */
 }tSecurityParams;
 
 /**
@@ -135,39 +129,23 @@ typedef struct _tBLEProfileGlobalContext
    * the UUID list to be used while advertising
    */
   uint8_t advtServUUID[100];
-  /* USER CODE BEGIN BleGlobalContext_t*/
 
-  /* USER CODE END BleGlobalContext_t */
 }BleGlobalContext_t;
 
 typedef struct
 {
   BleGlobalContext_t BleApplicationContext_legacy;
   APP_BLE_ConnStatus_t Device_Connection_Status;
-  /* USER CODE BEGIN PTD_1*/
 
-  /* USER CODE END PTD_1 */
 }BleApplicationContext_t;
 
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
 
 /* Private defines -----------------------------------------------------------*/
-#define FAST_ADV_TIMEOUT               (30*1000*1000/CFG_TS_TICK_VAL) /**< 30s */
-#define INITIAL_ADV_TIMEOUT            (60*1000*1000/CFG_TS_TICK_VAL) /**< 60s */
 
 #define BD_ADDR_SIZE_LOCAL    6
 #define BLE_DEFAULT_PIN                     (111111)
 
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
 /* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_CmdPacket_t BleCmdBuffer;
@@ -206,28 +184,20 @@ static BleApplicationContext_t BleApplicationContext;
 
 Custom_App_ConnHandle_Not_evt_t HandleNotification;
 
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
-#define SIZE_TAB_CONN_INT            2
-float a_ConnInterval[SIZE_TAB_CONN_INT] = {50, 1000}; /* ms */
-uint8_t index_con_int, mutex;
-#endif /* L2CAP_REQUEST_NEW_CONN_PARAM != 0 */
-
 /**
  * Advertising Data
  */
-uint8_t a_AdvData[14] =
+uint8_t a_AdvData[] =
 {
   2, AD_TYPE_TX_POWER_LEVEL, 0 /* 0dBm */, /* Transmission Power */
   10, AD_TYPE_COMPLETE_LOCAL_NAME, 'R', 'T', 'S', '_', 'R', 'L', 'S', '0', '1',  /* Complete name */
 
 };
 
-/* USER CODE BEGIN PV */
 SemaphoreHandle_t g_x_mtx_hci = NULL;
 SemaphoreHandle_t g_x_sem_hci = NULL;
 TaskHandle_t g_x_hci_user_evt_task = NULL;
 TaskHandle_t g_x_hci_adv_cancel_task = NULL;
-/* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 static void BLE_UserEvtRx(void *p_Payload);
@@ -237,21 +207,9 @@ static void Ble_Hci_Gap_Gatt_Init(void);
 static const uint8_t* BleGetBdAddress(void);
 static void Adv_Request(APP_BLE_ConnStatus_t NewStatus);
 static void Adv_Cancel(void);
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
-static void BLE_SVC_L2CAP_Conn_Update(uint16_t ConnectionHandle);
-static void Connection_Interval_Update_Req(void);
-#endif /* L2CAP_REQUEST_NEW_CONN_PARAM != 0 */
-
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
 
 /* External variables --------------------------------------------------------*/
 extern RNG_HandleTypeDef hrng;
-
-/* USER CODE BEGIN EV */
-
-/* USER CODE END EV */
 
 /* Functions Definition ------------------------------------------------------*/
 
@@ -260,7 +218,6 @@ void hci_user_evt_task ( void* vp_arg )
   while(1)
   {
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    HAL_GPIO_TogglePin(LED_GPIO_PORT, LED_BLUE_GPIO_PIN);
     hci_user_evt_proc();
   }
 }
@@ -280,9 +237,7 @@ void APP_BLE_Init(void)
 #if (RADIO_ACTIVITY_EVENT != 0)
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
 #endif /* RADIO_ACTIVITY_EVENT != 0 */
-  /* USER CODE BEGIN APP_BLE_Init_1 */
 
-  /* USER CODE END APP_BLE_Init_1 */
   SHCI_C2_Ble_Init_Cmd_Packet_t ble_init_cmd_packet =
   {
     {{0,0,0}},                          /**< Header unused */
@@ -358,10 +313,6 @@ void APP_BLE_Init(void)
    * From here, all initialization are BLE application specific
    */
 
-  /* USER CODE BEGIN APP_BLE_Init_4 */
-
-  /* USER CODE END APP_BLE_Init_4 */
-
   /**
    * Initialization of ADV - Ad Manufacturer Element - Support OTA Bit Mask
    */
@@ -377,19 +328,10 @@ void APP_BLE_Init(void)
   }
 #endif /* RADIO_ACTIVITY_EVENT != 0 */
 
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
-  index_con_int = 0;
-  mutex = 1;
-#endif /* L2CAP_REQUEST_NEW_CONN_PARAM != 0 */
-
   /**
    * Initialize Custom Template Application
    */
   Custom_APP_Init();
-
-  /* USER CODE BEGIN APP_BLE_Init_3 */
-
-  /* USER CODE END APP_BLE_Init_3 */
 
   /**
    * Make device discoverable
@@ -401,10 +343,6 @@ void APP_BLE_Init(void)
    * Start to Advertise to be connected by a Client
    */
   Adv_Request(APP_BLE_LP_ADV);
-
-  /* USER CODE BEGIN APP_BLE_Init_2 */
-
-  /* USER CODE END APP_BLE_Init_2 */
 
   return;
 }
@@ -423,10 +361,6 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
   aci_gap_pairing_complete_event_rp0          *p_pairing_complete;
   /* PAIRING */
 
-  /* USER CODE BEGIN SVCCTL_App_Notification */
-
-  /* USER CODE END SVCCTL_App_Notification */
-
   p_event_pckt = (hci_event_pckt*) ((hci_uart_pckt *) p_Pckt)->data;
 
   switch (p_event_pckt->evt)
@@ -443,10 +377,6 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
         printf("     - Connection Handle:   0x%x\n     - Reason:    0x%x\n\r",
                     p_disconnection_complete_event->Connection_Handle,
                     p_disconnection_complete_event->Reason);
-
-        /* USER CODE BEGIN EVT_DISCONN_COMPLETE_2 */
-
-        /* USER CODE END EVT_DISCONN_COMPLETE_2 */
       }
 
       /* restart advertising */
@@ -458,9 +388,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
       HandleNotification.Custom_Evt_Opcode = CUSTOM_DISCON_HANDLE_EVT;
       HandleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
       Custom_APP_Notification(&HandleNotification);
-      /* USER CODE BEGIN EVT_DISCONN_COMPLETE */
 
-      /* USER CODE END EVT_DISCONN_COMPLETE */
       break; /* HCI_DISCONNECTION_COMPLETE_EVT_CODE */
     }
 
@@ -472,18 +400,13 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
 	  UNUSED(p_hardware_error_event);
       printf(">>== HCI_HARDWARE_ERROR_EVT_CODE\n");
       printf("Hardware Code = 0x%02X\n",p_hardware_error_event->Hardware_Code);
-      /* USER CODE BEGIN HCI_EVT_LE_HARDWARE_ERROR */
-
-      /* USER CODE END HCI_EVT_LE_HARDWARE_ERROR */
       break; /* HCI_HARDWARE_ERROR_EVT_CODE */
     }
 
     case HCI_LE_META_EVT_CODE:
     {
       p_meta_evt = (evt_le_meta_event*) p_event_pckt->data;
-      /* USER CODE BEGIN EVT_LE_META_EVENT */
 
-      /* USER CODE END EVT_LE_META_EVENT */
       switch (p_meta_evt->subevent)
       {
         case HCI_LE_CONNECTION_UPDATE_COMPLETE_SUBEVT_CODE:
@@ -493,10 +416,6 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
                        p_connection_update_complete_event->Conn_Interval*1.25,
                        p_connection_update_complete_event->Conn_Latency,
                        p_connection_update_complete_event->Supervision_Timeout*10);
-
-          /* USER CODE BEGIN EVT_LE_CONN_UPDATE_COMPLETE */
-
-          /* USER CODE END EVT_LE_CONN_UPDATE_COMPLETE */
           break;
 
         case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE:
@@ -537,8 +456,6 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
           HandleNotification.Custom_Evt_Opcode = CUSTOM_CONN_HANDLE_EVT;
           HandleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
           Custom_APP_Notification(&HandleNotification);
-          /* USER CODE BEGIN HCI_EVT_LE_CONN_COMPLETE */
-          /* USER CODE END HCI_EVT_LE_CONN_COMPLETE */
           break; /* HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE */
         }
 
@@ -697,61 +614,38 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
         break;
 
         default:
-          /* USER CODE BEGIN SUBEVENT_DEFAULT */
 
-          /* USER CODE END SUBEVENT_DEFAULT */
           break;
       }
 
-      /* USER CODE BEGIN META_EVT */
 
-      /* USER CODE END META_EVT */
       break; /* HCI_LE_META_EVT_CODE */
     }
 
     case HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE:
       p_blecore_evt = (evt_blecore_aci*) p_event_pckt->data;
-      /* USER CODE BEGIN EVT_VENDOR */
 
-      /* USER CODE END EVT_VENDOR */
       switch (p_blecore_evt->ecode)
       {
-        /* USER CODE BEGIN ecode */
-
-        /* USER CODE END ecode */
-
         /**
          * SPECIFIC to Custom Template APP
          */
-        case ACI_L2CAP_CONNECTION_UPDATE_RESP_VSEVT_CODE:
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
-          mutex = 1;
-#endif /* L2CAP_REQUEST_NEW_CONN_PARAM != 0 */
-          /* USER CODE BEGIN EVT_BLUE_L2CAP_CONNECTION_UPDATE_RESP */
-
-          /* USER CODE END EVT_BLUE_L2CAP_CONNECTION_UPDATE_RESP */
-          break;
 
         case ACI_GAP_PROC_COMPLETE_VSEVT_CODE:
           printf(">>== ACI_GAP_PROC_COMPLETE_VSEVT_CODE \r");
-          /* USER CODE BEGIN EVT_BLUE_GAP_PROCEDURE_COMPLETE */
 
-          /* USER CODE END EVT_BLUE_GAP_PROCEDURE_COMPLETE */
           break; /* ACI_GAP_PROC_COMPLETE_VSEVT_CODE */
 
 #if (RADIO_ACTIVITY_EVENT != 0)
         case ACI_HAL_END_OF_RADIO_ACTIVITY_VSEVT_CODE:
-          /* USER CODE BEGIN RADIO_ACTIVITY_EVENT*/
-          /* USER CODE END RADIO_ACTIVITY_EVENT*/
-          break; /* ACI_HAL_END_OF_RADIO_ACTIVITY_VSEVT_CODE */
+            HAL_GPIO_TogglePin(LED_GPIO_PORT, LED_BLUE_GPIO_PIN);
+        break; /* ACI_HAL_END_OF_RADIO_ACTIVITY_VSEVT_CODE */
 #endif /* RADIO_ACTIVITY_EVENT != 0 */
 
         /* PAIRING */
         case (ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE):
             printf(">>== ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE\n");
-          /* USER CODE BEGIN ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE*/
 
-          /* USER CODE END ACI_GAP_KEYPRESS_NOTIFICATION_VSEVT_CODE*/
           break;
 
         case ACI_GAP_PASS_KEY_REQ_VSEVT_CODE:
@@ -759,9 +653,6 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
 	      uint32_t pin;
           printf(">>== ACI_GAP_PASS_KEY_REQ_VSEVT_CODE \n");
           pin = BLE_DEFAULT_PIN;
-          /* USER CODE BEGIN ACI_GAP_PASS_KEY_REQ_VSEVT_CODE_0 */
-
-          /* USER CODE END ACI_GAP_PASS_KEY_REQ_VSEVT_CODE_0 */
 
           ret = aci_gap_pass_key_resp(BleApplicationContext.BleApplicationContext_legacy.connectionHandle, pin);
           if (ret != BLE_STATUS_SUCCESS)
@@ -772,9 +663,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
           {
             printf("==>> aci_gap_pass_key_resp : Success \n");
           }
-          /* USER CODE BEGIN ACI_GAP_PASS_KEY_REQ_VSEVT_CODE*/
 
-          /* USER CODE END ACI_GAP_PASS_KEY_REQ_VSEVT_CODE*/
           break;
 		}
 
@@ -793,9 +682,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
           {
             printf("==>> aci_gap_numeric_comparison_value_confirm_yesno-->YES : Success \n");
           }
-          /* USER CODE BEGIN ACI_GAP_NUMERIC_COMPARISON_VALUE_VSEVT_CODE*/
 
-          /* USER CODE END ACI_GAP_NUMERIC_COMPARISON_VALUE_VSEVT_CODE*/
           break;
 
         case ACI_GAP_PAIRING_COMPLETE_VSEVT_CODE:
@@ -812,9 +699,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
           }
           printf("\n");
 
-          /* USER CODE BEGIN ACI_GAP_PAIRING_COMPLETE_VSEVT_CODE*/
 
-          /* USER CODE END ACI_GAP_PAIRING_COMPLETE_VSEVT_CODE*/
           break;
         /* PAIRING */
         case ACI_GATT_INDICATION_VSEVT_CODE:
@@ -832,24 +717,14 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *p_Pckt)
 		  UNUSED(p_warning_event);
           printf(">>== ACI_HAL_WARNING_VSEVT_CODE\n");
           printf("Warning Type = 0x%02X\n", p_warning_event->Warning_Type);
-	      /* USER CODE BEGIN ACI_HAL_WARNING_VSEVT_CODE */
 
-          /* USER CODE END ACI_HAL_WARNING_VSEVT_CODE */
           break;
         }
-        /* USER CODE BEGIN BLUE_EVT */
 
-        /* USER CODE END BLUE_EVT */
       }
       break; /* HCI_VENDOR_SPECIFIC_DEBUG_EVT_CODE */
 
-      /* USER CODE BEGIN EVENT_PCKT */
-
-      /* USER CODE END EVENT_PCKT */
-
     default:
-      /* USER CODE BEGIN ECODE_DEFAULT*/
-      /* USER CODE END ECODE_DEFAULT*/
       break;
   }
 
@@ -860,10 +735,6 @@ APP_BLE_ConnStatus_t APP_BLE_Get_Server_Connection_Status(void)
 {
   return BleApplicationContext.Device_Connection_Status;
 }
-
-/* USER CODE BEGIN FD*/
-
-/* USER CODE END FD*/
 
 /*************************************************************
  *
@@ -895,9 +766,6 @@ static void Ble_Hci_Gap_Gatt_Init(void)
   const uint8_t *p_bd_addr;
   uint16_t a_appearance[1] = {BLE_CFG_GAP_APPEARANCE};
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
-  /* USER CODE BEGIN Ble_Hci_Gap_Gatt_Init*/
-
-  /* USER CODE END Ble_Hci_Gap_Gatt_Init*/
 
   printf("==>> Start Ble_Hci_Gap_Gatt_Init function\n");
 
@@ -929,31 +797,6 @@ static void Ble_Hci_Gap_Gatt_Init(void)
     printf("  Success: aci_hal_write_config_data command - CONFIG_DATA_PUBLIC_ADDRESS_OFFSET\n");
     printf("  Public Bluetooth Address: %02x:%02x:%02x:%02x:%02x:%02x\n",p_bd_addr[5],p_bd_addr[4],p_bd_addr[3],p_bd_addr[2],p_bd_addr[1],p_bd_addr[0]);
   }
-
-  /**
-   * Static random Address
-   * The two upper bits shall be set to 1
-   * The lowest 32bits is read from the UDN to differentiate between devices
-   * The RNG may be used to provide a random number on each power on
-   */
-#if (CFG_BLE_ADDRESS_TYPE != GAP_PUBLIC_ADDR)
-
-  ret = aci_hal_write_config_data(CONFIG_DATA_RANDOM_ADDRESS_OFFSET, CONFIG_DATA_RANDOM_ADDRESS_LEN, (uint8_t*)a_srd_bd_addr);
-  if (ret != BLE_STATUS_SUCCESS)
-  {
-    printf("  Fail   : aci_hal_write_config_data command - CONFIG_DATA_RANDOM_ADDRESS_OFFSET, result: 0x%x \n", ret);
-  }
-  else
-  {
-    printf("  Success: aci_hal_write_config_data command - CONFIG_DATA_RANDOM_ADDRESS_OFFSET\n");
-    printf("  Random Bluetooth Address: %02x:%02x:%02x:%02x:%02x:%02x\n", (uint8_t)(a_srd_bd_addr[1] >> 8),
-                                                                               (uint8_t)(a_srd_bd_addr[1]),
-                                                                               (uint8_t)(a_srd_bd_addr[0] >> 24),
-                                                                               (uint8_t)(a_srd_bd_addr[0] >> 16),
-                                                                               (uint8_t)(a_srd_bd_addr[0] >> 8),
-                                                                               (uint8_t)(a_srd_bd_addr[0]));
-  }
-#endif /* CFG_BLE_ADDRESS_TYPE != GAP_PUBLIC_ADDR */
 
   /**
    * Write Identity root key used to derive IRK and DHK(Legacy)
@@ -1010,19 +853,7 @@ static void Ble_Hci_Gap_Gatt_Init(void)
   /**
    * Initialize GAP interface
    */
-  role = 0;
-
-#if (BLE_CFG_PERIPHERAL == 1)
-  role |= GAP_PERIPHERAL_ROLE;
-#endif /* BLE_CFG_PERIPHERAL == 1 */
-
-#if (BLE_CFG_CENTRAL == 1)
-  role |= GAP_CENTRAL_ROLE;
-#endif /* BLE_CFG_CENTRAL == 1 */
-
-/* USER CODE BEGIN Role_Mngt*/
-
-/* USER CODE END Role_Mngt */
+  role = GAP_PERIPHERAL_ROLE;
 
   if (role > 0)
   {
@@ -1102,9 +933,6 @@ static void Ble_Hci_Gap_Gatt_Init(void)
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMin = CFG_ENCRYPTION_KEY_SIZE_MIN;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.encryptionKeySizeMax = CFG_ENCRYPTION_KEY_SIZE_MAX;
   BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode = CFG_BONDING_MODE;
-  /* USER CODE BEGIN Ble_Hci_Gap_Gatt_Init_1*/
-
-  /* USER CODE END Ble_Hci_Gap_Gatt_Init_1*/
 
   ret = aci_gap_set_authentication_requirement(BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.bonding_mode,
                                                BleApplicationContext.BleApplicationContext_legacy.bleSecurityParam.mitm_mode,
@@ -1168,10 +996,6 @@ static void Adv_Request(APP_BLE_ConnStatus_t NewStatus)
     printf("==>> aci_gap_set_discoverable - Success\n");
   }
 
-/* USER CODE BEGIN Adv_Request_1*/
-
-/* USER CODE END Adv_Request_1*/
-
   /* Update Advertising data */
   ret = aci_gap_update_adv_data(sizeof(a_AdvData), (uint8_t*) a_AdvData);
   if (ret != BLE_STATUS_SUCCESS)
@@ -1234,9 +1058,7 @@ const uint8_t* BleGetBdAddress(void)
   return p_bd_addr;
 }
 
-/* USER CODE BEGIN FD_LOCAL_FUNCTION */
 
-/* USER CODE END FD_LOCAL_FUNCTION */
 
 /*************************************************************
  *
@@ -1245,10 +1067,6 @@ const uint8_t* BleGetBdAddress(void)
  *************************************************************/
 static void Adv_Cancel(void)
 {
-  /* USER CODE BEGIN Adv_Cancel_1 */
-
-  /* USER CODE END Adv_Cancel_1 */
-
   if (BleApplicationContext.Device_Connection_Status != APP_BLE_CONNECTED_SERVER)
   {
     tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
@@ -1267,66 +1085,9 @@ static void Adv_Cancel(void)
     }
   }
 
-  /* USER CODE BEGIN Adv_Cancel_2 */
-
-  /* USER CODE END Adv_Cancel_2 */
-
   return;
 }
 
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
-void BLE_SVC_L2CAP_Conn_Update(uint16_t ConnectionHandle)
-{
-  /* USER CODE BEGIN BLE_SVC_L2CAP_Conn_Update_1 */
-
-  /* USER CODE END BLE_SVC_L2CAP_Conn_Update_1 */
-
-  if (mutex == 1)
-  {
-    mutex = 0;
-    index_con_int = (index_con_int + 1)%SIZE_TAB_CONN_INT;
-    uint16_t interval_min = CONN_P(a_ConnInterval[index_con_int]);
-    uint16_t interval_max = CONN_P(a_ConnInterval[index_con_int]);
-    uint16_t peripheral_latency = L2CAP_PERIPHERAL_LATENCY;
-    uint16_t timeout_multiplier = L2CAP_TIMEOUT_MULTIPLIER;
-    tBleStatus ret;
-
-    ret = aci_l2cap_connection_parameter_update_req(BleApplicationContext.BleApplicationContext_legacy.connectionHandle,
-                                                    interval_min, interval_max,
-                                                    peripheral_latency, timeout_multiplier);
-    if (ret != BLE_STATUS_SUCCESS)
-    {
-      printf("BLE_SVC_L2CAP_Conn_Update(), Failed \r\n\r");
-    }
-    else
-    {
-      printf("BLE_SVC_L2CAP_Conn_Update(), Successfully \r\n\r");
-    }
-  }
-
-  /* USER CODE BEGIN BLE_SVC_L2CAP_Conn_Update_2 */
-
-  /* USER CODE END BLE_SVC_L2CAP_Conn_Update_2 */
-
-  return;
-}
-#endif /* L2CAP_REQUEST_NEW_CONN_PARAM != 0 */
-
-#if (L2CAP_REQUEST_NEW_CONN_PARAM != 0)
-static void Connection_Interval_Update_Req(void)
-{
-  if (BleApplicationContext.Device_Connection_Status != APP_BLE_FAST_ADV && BleApplicationContext.Device_Connection_Status != APP_BLE_IDLE)
-  {
-    BLE_SVC_L2CAP_Conn_Update(BleApplicationContext.BleApplicationContext_legacy.connectionHandle);
-  }
-
-  return;
-}
-#endif /* L2CAP_REQUEST_NEW_CONN_PARAM != 0 */
-
-/* USER CODE BEGIN FD_SPECIFIC_FUNCTIONS */
-
-/* USER CODE END FD_SPECIFIC_FUNCTIONS */
 /*************************************************************
  *
  * WRAP FUNCTIONS
@@ -1406,6 +1167,3 @@ void SVCCTL_ResumeUserEventFlow(void)
   return;
 }
 
-/* USER CODE BEGIN FD_WRAP_FUNCTIONS */
-
-/* USER CODE END FD_WRAP_FUNCTIONS */

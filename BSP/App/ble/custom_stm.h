@@ -28,9 +28,6 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 typedef enum
@@ -38,6 +35,8 @@ typedef enum
   /* Nordic_UART_Service */
   CUSTOM_STM_RX,
   CUSTOM_STM_TX,
+  CUSTOM_STM_BLOB_RX,
+  CUSTOM_STM_BLOB_TX,
 } Custom_STM_Char_Opcode_t;
 
 typedef enum
@@ -49,6 +48,14 @@ typedef enum
   CUSTOM_STM_TX_NOTIFY_ENABLED_EVT,
   CUSTOM_STM_TX_NOTIFY_DISABLED_EVT,
   CUSTOM_STM_NOTIFICATION_COMPLETE_EVT,
+
+  /* BLOB_RX_Characteristic */
+  CUSTOM_STM_BLOB_RX_WRITE_NO_RESP_EVT,
+  CUSTOM_STM_BLOB_RX_WRITE_EVT,
+  /* BLOB_TX_Characteristic */
+  CUSTOM_STM_BLOB_TX_NOTIFY_ENABLED_EVT,
+  CUSTOM_STM_BLOB_TX_NOTIFY_DISABLED_EVT,
+  CUSTOM_STM_BLOB_NOTIFICATION_COMPLETE_EVT,
 
   CUSTOM_STM_BOOT_REQUEST_EVT
 } Custom_STM_Opcode_evt_t;
@@ -68,27 +75,13 @@ typedef struct
   uint16_t                      AttrHandle;
 } Custom_STM_App_Notification_evt_t;
 
-/* USER CODE BEGIN ET */
-
-/* USER CODE END ET */
-
 /* Exported constants --------------------------------------------------------*/
 extern uint16_t SizeRx;
 extern uint16_t SizeTx;
 
-/* USER CODE BEGIN EC */
-
-/* USER CODE END EC */
-
 /* External variables --------------------------------------------------------*/
-/* USER CODE BEGIN EV */
-
-/* USER CODE END EV */
 
 /* Exported macros -----------------------------------------------------------*/
-/* USER CODE BEGIN EM */
-
-/* USER CODE END EM */
 
 /* Exported functions ------------------------------------------------------- */
 void SVCCTL_InitCustomSvc(void);
@@ -96,9 +89,6 @@ void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotificatio
 tBleStatus Custom_STM_App_Update_Char(Custom_STM_Char_Opcode_t CharOpcode,  uint8_t *pPayload);
 tBleStatus Custom_STM_App_Update_Char_Variable_Length(Custom_STM_Char_Opcode_t CharOpcode, uint8_t *pPayload, uint8_t size);
 tBleStatus Custom_STM_App_Update_Char_Ext(uint16_t Connection_Handle, Custom_STM_Char_Opcode_t CharOpcode, uint8_t *pPayload);
-/* USER CODE BEGIN EF */
-
-/* USER CODE END EF */
 
 #ifdef __cplusplus
 }

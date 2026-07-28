@@ -35,9 +35,7 @@ set(STM32WBXX_DFP_SRCS
     ${CMAKE_CURRENT_LIST_DIR}/App/src/app_debug.c
     ${CMAKE_CURRENT_LIST_DIR}/App/src/app_entry.c
     ${CMAKE_CURRENT_LIST_DIR}/App/src/app_freertos.c
-    ${CMAKE_CURRENT_LIST_DIR}/App/src/hw_timerserver.c
     ${CMAKE_CURRENT_LIST_DIR}/App/src/main.c
-    ${CMAKE_CURRENT_LIST_DIR}/App/src/stm32_dfp/stm32_lpm_if.c
     ${CMAKE_CURRENT_LIST_DIR}/App/src/stm32_dfp/stm32wbxx_it.c
     ${CMAKE_CURRENT_LIST_DIR}/App/src/stm32_dfp/stm32wbxx_hal_msp.c
     ${CMAKE_CURRENT_LIST_DIR}/App/src/stm32_dfp/stm32wbxx_hal_timebase_tim2.c

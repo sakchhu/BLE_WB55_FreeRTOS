@@ -1,21 +1,9 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
+  * @brief          : Main program
   ******************************************************************************
   */
-/* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "app_entry.h"
 #include "stm32wbxx_hal.h"
@@ -27,24 +15,12 @@
 #include "task.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 IPCC_HandleTypeDef hipcc;
@@ -53,26 +29,13 @@ RNG_HandleTypeDef hrng;
 
 RTC_HandleTypeDef hrtc;
 
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
-
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_IPCC_Init(void);
-static void MX_RTC_Init(void);
-static void MX_RNG_Init(void);
-static void MX_RF_Init(void);
-/* USER CODE BEGIN PFP */
-/* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
 extern void Error_Handler( void );
-/* USER CODE END 0 */
-
 
 void app_init( void* vp_arg )
 {
@@ -86,21 +49,12 @@ void app_init( void* vp_arg )
   */
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
   /* Config code for STM32_WPAN (HSE Tuning must be done before system clock configuration) */
   MX_APPE_Config();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
@@ -110,24 +64,12 @@ int main(void)
 
   /* IPCC initialisation */
   MX_IPCC_Init();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_RTC_Init();
-  MX_RNG_Init();
-  MX_RF_Init();
-  /* USER CODE BEGIN 2 */
-
-  /* USER CODE END 2 */
-
   /* Init code for STM32_WPAN */
   xTaskCreate(app_init, "appInit", 0x1000, NULL, 1, NULL);
 
-  MX_APPE_Process();
+  vTaskStartScheduler();
 }
 
 /**
@@ -169,7 +111,7 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSE;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.AHBCLK2Divider = RCC_SYSCLK_DIV1;
@@ -204,9 +146,7 @@ void PeriphCommonClock_Config(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN Smps */
 
-  /* USER CODE END Smps */
 }
 
 /**
@@ -216,113 +156,11 @@ void PeriphCommonClock_Config(void)
   */
 static void MX_IPCC_Init(void)
 {
-
-  /* USER CODE BEGIN IPCC_Init 0 */
-
-  /* USER CODE END IPCC_Init 0 */
-
-  /* USER CODE BEGIN IPCC_Init 1 */
-
-  /* USER CODE END IPCC_Init 1 */
   hipcc.Instance = IPCC;
   if (HAL_IPCC_Init(&hipcc) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN IPCC_Init 2 */
-
-  /* USER CODE END IPCC_Init 2 */
-
-}
-
-/**
-  * @brief RF Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_RF_Init(void)
-{
-
-  /* USER CODE BEGIN RF_Init 0 */
-
-  /* USER CODE END RF_Init 0 */
-
-  /* USER CODE BEGIN RF_Init 1 */
-
-  /* USER CODE END RF_Init 1 */
-  /* USER CODE BEGIN RF_Init 2 */
-
-  /* USER CODE END RF_Init 2 */
-
-}
-
-/**
-  * @brief RNG Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_RNG_Init(void)
-{
-
-  /* USER CODE BEGIN RNG_Init 0 */
-
-  /* USER CODE END RNG_Init 0 */
-
-  /* USER CODE BEGIN RNG_Init 1 */
-
-  /* USER CODE END RNG_Init 1 */
-  hrng.Instance = RNG;
-  hrng.Init.ClockErrorDetection = RNG_CED_ENABLE;
-  if (HAL_RNG_Init(&hrng) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN RNG_Init 2 */
-
-  /* USER CODE END RNG_Init 2 */
-
-}
-
-/**
-  * @brief RTC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_RTC_Init(void)
-{
-
-  /* USER CODE BEGIN RTC_Init 0 */
-
-  /* USER CODE END RTC_Init 0 */
-
-  /* USER CODE BEGIN RTC_Init 1 */
-
-  /* USER CODE END RTC_Init 1 */
-
-  /** Initialize RTC Only
-  */
-  hrtc.Instance = RTC;
-  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
-  hrtc.Init.AsynchPrediv = CFG_RTC_ASYNCH_PRESCALER;
-  hrtc.Init.SynchPrediv = CFG_RTC_SYNCH_PRESCALER;
-  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
-  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
-  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
-  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
-  if (HAL_RTC_Init(&hrtc) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Enable the WakeUp
-  */
-  if (HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 0, RTC_WAKEUPCLOCK_RTCCLK_DIV16) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN RTC_Init 2 */
-
-  /* USER CODE END RTC_Init 2 */
 
 }
 
@@ -334,9 +172,6 @@ static void MX_RTC_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  /* USER CODE BEGIN MX_GPIO_Init_1 */
-
-  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -349,46 +184,6 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4, GPIO_PIN_RESET);
 
-  // /*Configure GPIO pins : PC13 PC0 PC1 PC2
-  //                          PC3 PC5 PC6 PC10
-  //                          PC11 PC12 */
-  // GPIO_InitStruct.Pin = GPIO_PIN_13|GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2
-  //                         |GPIO_PIN_3|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_10
-  //                         |GPIO_PIN_11|GPIO_PIN_12;
-  // GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  // GPIO_InitStruct.Pull = GPIO_NOPULL;
-  // HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  // /*Configure GPIO pin : PH3 */
-  // GPIO_InitStruct.Pin = GPIO_PIN_3;
-  // GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  // GPIO_InitStruct.Pull = GPIO_NOPULL;
-  // HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
-
-  // /*Configure GPIO pins : PB8 PB9 PB2 PB10
-  //                          PB11 PB0 PB1 PB12
-  //                          PB13 PB14 PB15 PB3
-  //                          PB4 PB5 PB6 PB7 */
-  // GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_2|GPIO_PIN_10
-  //                         |GPIO_PIN_11|GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_12
-  //                         |GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15|GPIO_PIN_3
-  //                         |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
-  // GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  // GPIO_InitStruct.Pull = GPIO_NOPULL;
-  // HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  // /*Configure GPIO pins : PA0 PA1 PA2 PA3
-  //                          PA4 PA5 PA6 PA7
-  //                          PA8 PA9 PA10 PA11
-  //                          PA12 PA13 PA14 PA15 */
-  // GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3
-  //                         |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7
-  //                         |GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
-  //                         |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
-  // GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  // GPIO_InitStruct.Pull = GPIO_NOPULL;
-  // HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
   /*Configure GPIO pin : PC4 */
   GPIO_InitStruct.Pin = GPIO_PIN_4;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -396,19 +191,4 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  // /*Configure GPIO pin : PE4 */
-  // GPIO_InitStruct.Pin = GPIO_PIN_4;
-  // GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  // GPIO_InitStruct.Pull = GPIO_NOPULL;
-  // HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-  // /*Configure GPIO pins : PD0 PD1 */
-  // GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
-  // GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-  // GPIO_InitStruct.Pull = GPIO_NOPULL;
-  // HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-
-  /* USER CODE BEGIN MX_GPIO_Init_2 */
-
-  /* USER CODE END MX_GPIO_Init_2 */
 }
